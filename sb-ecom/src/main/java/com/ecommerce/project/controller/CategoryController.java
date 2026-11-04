@@ -19,14 +19,16 @@ public class CategoryController {
     }
 
     @GetMapping("/api/public/categories")
-    public List<category> getAllCategories() {
-        return categoryService.getAllCategories();
+    public ResponseEntity<List<category>> getAllCategories() {
+
+        List<category> Categories = categoryService.getAllCategories();
+        return new ResponseEntity<>(Categories,HttpStatus.OK);
     }
 
     @PostMapping("/api/public/categories")
-    public String createCategory(@RequestBody category category) {
+    public ResponseEntity<String> createCategory(@RequestBody category category) {
         categoryService.createCategory(category);
-        return "Category added successfully";
+        return new ResponseEntity<>("Category added successfully",HttpStatus.CREATED);
     }
     @DeleteMapping("/api/admit/categories/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId){
@@ -40,4 +42,29 @@ public class CategoryController {
             );
         }
     }
+    @PutMapping("/api/public/categories/{categoryId}")
+    public ResponseEntity<String> updateCategory(
+            @RequestBody category category,
+            @PathVariable Long categoryId) {
+
+        try {
+
+            category.setCategoryId(categoryId);
+
+            category savedCategory = categoryService.updateCategory(category);
+
+            return new ResponseEntity<>(
+                    "Category updated successfully",
+                    HttpStatus.OK
+            );
+
+        } catch (ResponseStatusException e) {
+
+            return new ResponseEntity<>(
+                    e.getReason(),
+                    (HttpStatus) e.getStatusCode()
+            );
+        }
+    }
+
 }
